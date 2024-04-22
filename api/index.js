@@ -1,7 +1,17 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import morgan from "morgan";
 import cors from "cors";
+import { auth } from "express-oauth2-jwt-bearer";
+
+// this is a middleware that will validate the access token sent by the client
+const requireAuth = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER,
+  tokenSigningAlg: "RS256",
+});
 
 const app = express();
 
@@ -183,6 +193,35 @@ app.delete("/items/:id", async (req, res) => {
     where: { id: itemId },
   });
   res.status(204).send();
+});
+
+// this endpoint is used by the client to verify the user status and to make sure the user is registered in our database once they signup with Auth0
+// if not registered in our database we will create it.
+// if the user is already registered we will return the user information
+app.post("/verify-user", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  const email = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/email`];
+  const name = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/name`];
+
+  const user = await prisma.user.findFirst({
+    where: {
+      auth0Id: auth0Id,
+    },
+  });
+
+  if (user) {
+    res.json(user);
+  } else {
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        auth0Id,
+        name,
+      },
+    });
+
+    res.json(newUser);
+  }
 });
 
 // Starts HTTP Server

@@ -20,7 +20,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import VendorData from "./VendorData";
 import VendorPurchaseOrder from "./VendorPurchaseOrder";
-import { useAppContext } from "../../appContext.js";
+import { useAppContext } from "../../AppContext.js";
 
 interface TabPanelProps {
   children?: React.ReactNode;

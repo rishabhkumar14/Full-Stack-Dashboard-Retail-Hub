@@ -19,7 +19,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import FinancesIncome from "./FinancesIncome";
 import FinancesExpense from "./FinancesExpense";
-import { useAppContext } from "../../appContext.js";
+import { useAppContext } from "../../AppContext.js";
 
 interface TabPanelProps {
   children?: React.ReactNode;

@@ -29,15 +29,21 @@ import { Avatar } from "@mui/material";
 import rishabhAvtar from "../../assets/rishabh.jpg";
 import logo from "../../assets/logo.png";
 import CardHeader from "@mui/material/CardHeader";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
 export default function Navbar(props) {
   const [open, setOpen] = React.useState(true);
-
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
+
+  const navigate = useNavigate();
+  const { isAuthenticated, loginWithRedirect, user, isLoading, logout } =
+    useAuth0();
+  const signUp = () => loginWithRedirect({ screen_hint: "signup" });
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -61,12 +67,43 @@ export default function Navbar(props) {
           </IconButton>
           <img className="logo" src={logo} alt="logo" style={{ height: 45 }} />
 
-          <Avatar
-            alt="Rishabh Kumar"
-            src={rishabhAvtar}
-            sx={{ width: 40, height: 40 }}
-            style={{ marginLeft: "auto", marginRight: "10px" }}
-          />
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {isAuthenticated ? (
+              <div
+                style={{ display: "flex", alignItems: "center" }}
+                onClick={() => navigate("/")}
+              >
+                <Typography variant="body1" sx={{ color: "lightgrey", mr: 1 }}>
+                  Rishabh Kumar
+                </Typography>
+                <Avatar
+                  alt="Rishabh Kumar"
+                  src={rishabhAvtar}
+                  sx={{ width: 40, height: 40 }}
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+                onClick={loginWithRedirect}
+              >
+                <Typography variant="body1" sx={{ color: "lightgrey", mr: 1 }}>
+                  Log In
+                </Typography>
+                <Avatar alt="login" sx={{ width: 40, height: 40 }} />
+              </div>
+            )}
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -142,43 +179,50 @@ export default function Navbar(props) {
 
             <Divider />
           </div>
-
-          <div style={{ marginTop: "auto" }}>
-            <List>
-              <ListItem key="logout" disablePadding className="nav-item">
-                <ListItemButton>
-                  <ListItemIcon>
-                    <Typography
-                      sx={{
-                        color: "white",
-                      }}
-                    >
-                      <PowerSettingsNewIcon />
-                    </Typography>
-                  </ListItemIcon>
-                  <Link
-                    to="/logout"
-                    className="nav-link"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <ListItemText>
+          {isAuthenticated ? (
+            <div style={{ marginTop: "auto", cursor: "pointer" }}>
+              <List>
+                <ListItem key="logout" disablePadding className="nav-item">
+                  <ListItemButton>
+                    <ListItemIcon>
                       <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
                         sx={{
                           color: "white",
-                          textDecoration: "none",
                         }}
                       >
-                        {"Logout"}
+                        <PowerSettingsNewIcon />
                       </Typography>
-                    </ListItemText>
-                  </Link>
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </div>
+                    </ListItemIcon>
+
+                    <Link
+                      to="/"
+                      className="nav-link"
+                      style={{ textDecoration: "none" }}
+                      onClick={() =>
+                        logout({ returnTo: window.location.origin })
+                      }
+                    >
+                      <ListItemText>
+                        <Typography
+                          variant="h6"
+                          noWrap
+                          component="div"
+                          sx={{
+                            color: "white",
+                            textDecoration: "none",
+                          }}
+                        >
+                          {"Logout"}
+                        </Typography>
+                      </ListItemText>
+                    </Link>
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </div>
+          ) : (
+            <></>
+          )}
         </Box>
       </Drawer>
     </Box>

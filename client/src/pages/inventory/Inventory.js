@@ -17,7 +17,7 @@ import {
   deleteItem,
   fetchItemsByCategory,
 } from "../../services";
-import { useAppContext } from "../../appContext.js";
+import { useAppContext } from "../../AppContext.js";
 
 function Inventory(props) {
   const [categories, setCategories] = useState([]);
