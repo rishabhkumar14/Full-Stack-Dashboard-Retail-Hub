@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,9 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User table to store user details
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  auth0Id      String   @unique @default("")
-  name         String?
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  name        String    // Change from username to name
+  email       String?   @unique
+  auth0Id     String?   // New field to store Auth0 ID
+}
+
+// Category table to store different types of categories
+model Category {
+  id                  Int       @id @default(autoincrement())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  category_name       String    @unique    
+  category_description String   @db.Text // Increase the maximum length for description
+  emoji               String    // Required field for category symbol
+  items               Item[]    // Add an opposite relation field to Item model
+}
+
+// Item table to store unique items belonging to a category
+model Item {
+  id                Int       @id @default(autoincrement())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  item_name         String    @unique
+  item_description  String
+  price             Float
+  quantity          Int
+  categoryId        Int       // Foreign key referencing the Category table
+  category          Category  @relation(fields: [categoryId], references: [id])
 }
